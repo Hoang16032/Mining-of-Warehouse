@@ -22,7 +22,7 @@ print("--- Bắt đầu Grid Search cho Random Forest ---")
 # Lưới tham số RF
 param_grid = {
     'n_estimators': [100, 200, 300], 
-    'max_depth': [10, 20, None],     
+    'max_depth': [5, 10, 20, None],     
     'min_samples_leaf': [1, 2, 4],   
     'min_samples_split': [2, 5, 10], 
     'max_features': ['sqrt', 0.5], 

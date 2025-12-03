@@ -22,7 +22,7 @@ FEATURE_COLUMNS = [
 ]
 POSITIVE_CLASS_NAME = 'Rời bỏ (1)'
 NEGATIVE_CLASS_NAME = 'Ở lại (0)'
-K_FOLDS = 5          
+K_FOLDS = 5    
 try:
     df = pd.read_csv(INPUT_FILE)
     print(f"Đã tải file '{INPUT_FILE}' thành công. ({len(df)} dòng)")
@@ -94,19 +94,35 @@ mean_cm = np.mean(cm_list, axis=0)
 rounded_cm = np.rint(mean_cm).astype(int)
 axis_labels = [NEGATIVE_CLASS_NAME, POSITIVE_CLASS_NAME]
 
-plt.figure(figsize=(8, 6))
-sns.heatmap(
+plt.figure(figsize=(8, 7))
+ax = sns.heatmap(
     rounded_cm, annot=True, fmt='d', 
     cmap='Blues', 
     xticklabels=axis_labels, yticklabels=axis_labels,
-    annot_kws={"size": 14}
+    annot_kws={"size": 14},
+    cbar=False  
 )
-plt.title(f'Ma trận nhầm lẫn (XGboost) | Accuracy: {avg_acc:.2%}', fontsize=14)
-plt.xlabel('Dự đoán', fontsize=12); plt.ylabel('Thực tế', fontsize=12)
-plt.tight_layout()
-plt.savefig("xgb_kfold_matrix_final.png")
-print(f"\n Đã lưu Matrix: xgb_kfold_matrix_final.png")
-print("\n--- Đang tính toán Feature Importance (Model tổng) ---")
+plt.title('Ma trận nhầm lẫn cho mô hình XGboost', fontsize=16, pad=20)
+plt.xlabel('Predicted', fontsize=12)
+plt.ylabel('True', fontsize=12)
+stats_text = (
+    f"Đánh giá cho XGboost:\n"
+    f"Accuracy: {avg_acc:.4f}\n"
+    f"Precision: {avg_prec:.4f}\n"
+    f"Recall: {avg_rec:.4f}\n"
+    f"F1 Score: {avg_f1:.4f}"
+)
+plt.text(
+    x=0, y=1.12, 
+    s=stats_text, 
+    transform=ax.transAxes, 
+    fontsize=11, 
+    ha='left', va='bottom', 
+    fontfamily='monospace'
+)
+plt.tight_layout(rect=[0, 0, 1, 1])
+plt.savefig("xgb_matrix.png")
+print(f"Đã lưu Matrix: xgb_matrix.png")
 
 count_neg = (y == 0).sum()
 count_pos = (y == 1).sum()
@@ -116,7 +132,7 @@ spw_total = count_neg / count_pos
 final_model_viz = XGBClassifier(
     n_estimators=100,
     learning_rate=0.01,
-    max_depth=6,
+    max_depth=3,
     gamma=5,                     
     colsample_bytree=0.7, 
     subsample=1.0,             
@@ -132,10 +148,15 @@ importances = final_model_viz.feature_importances_
 indices = np.argsort(importances)[::-1]
 
 plt.figure(figsize=(10, 6))
-plt.title(f"Yếu tố ảnh hưởng nhất (XGBoost Optimized - Gamma={5})")
-plt.bar(range(X.shape[1]), importances[indices], align="center", color='orange') # Màu cam
+plt.title(f"Các yếu tố ảnh hưởng")
+plt.bar(range(X.shape[1]), importances[indices], align="center", color='orange') 
 plt.xticks(range(X.shape[1]), [FEATURE_COLUMNS[i] for i in indices], rotation=45)
+
+sorted_importances = importances[indices]
+for i, v in enumerate(sorted_importances):
+    plt.text(i, v + 0.002, f"{v:.3f}", ha='center', va='bottom', fontsize=10)
+    
 plt.tight_layout()
-plt.savefig("xgb_feature_importance_final.png")
-print(f"Đã lưu Feature Importance: xgb_feature_importance_final.png")
+plt.savefig("xgb_feature_importance.png")
+print(f"Đã lưu Feature Importance: xgb_feature_importance.png")
 

@@ -23,7 +23,7 @@ FEATURE_COLUMNS = [
 
 POSITIVE_CLASS_NAME = 'Rời bỏ (1)'
 NEGATIVE_CLASS_NAME = 'Ở lại (0)'
-K_FOLDS = 5          
+K_FOLDS = 5        
 
 # Nạp data
 try:
@@ -121,20 +121,37 @@ print(f"2. Precision (Độ chuẩn xác): {avg_prec:.2%}")
 print(f"3. Recall (Độ nhạy):         {avg_rec:.2%}")
 print(f"4. F1-Score (Cân bằng):      {avg_f1:.2%}")
 
-# Ma trận nhầm lẫn 
+# Ma trận nhầm lẫn
 mean_cm = np.mean(cm_list, axis=0)
 rounded_cm = np.rint(mean_cm).astype(int)
 axis_labels = [NEGATIVE_CLASS_NAME, POSITIVE_CLASS_NAME]
 
-plt.figure(figsize=(8, 6))
-sns.heatmap(
+plt.figure(figsize=(8, 7))
+ax = sns.heatmap(
     rounded_cm, annot=True, fmt='d', 
-    cmap='Blues',
+    cmap='Blues', 
     xticklabels=axis_labels, yticklabels=axis_labels,
-    annot_kws={"size": 14}
+    annot_kws={"size": 14},
+    cbar=False  
 )
-plt.title(f'Ma trận nhầm lẫn (K-Nearest Neighbors) | Accuracy: {avg_acc:.2%}', fontsize=14)
-plt.xlabel('Dự đoán', fontsize=12); plt.ylabel('Thực tế', fontsize=12)
-plt.tight_layout()
+plt.title('Ma trận nhầm lẫn cho KNN', fontsize=16, pad=20)
+plt.xlabel('Predicted', fontsize=12)
+plt.ylabel('True', fontsize=12)
+stats_text = (
+    f"Đánh giá cho KNN:\n"
+    f"Accuracy: {avg_acc:.4f}\n"
+    f"Precision: {avg_prec:.4f}\n"
+    f"Recall: {avg_rec:.4f}\n"
+    f"F1 Score: {avg_f1:.4f}"
+)
+plt.text(
+    x=0, y=1.12, 
+    s=stats_text, 
+    transform=ax.transAxes, 
+    fontsize=11, 
+    ha='left', va='bottom', 
+    fontfamily='monospace'
+)
+plt.tight_layout(rect=[0, 0, 1, 1])
 plt.savefig("knn_matrix.png")
-print(f"\nĐã lưu Matrix: knn_matrix.png")
+print(f"Đã lưu Matrix: knn_matrix.png")

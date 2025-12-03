@@ -23,7 +23,7 @@ count_neg = (y_train == 0).sum()
 count_pos = (y_train == 1).sum()
 spw = count_neg / count_pos
 print("--- BẮT ĐẦU GRID SEARCH CHO XGBOOST ---")
-print("(Quá trình này có thể mất 1-5 phút tùy máy...)")
+
 
 # 2. Thiết lập lưới tham số 
 param_grid = {

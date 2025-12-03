@@ -47,7 +47,7 @@ print("-" * 40)
 X_tune_train, X_tune_val, y_tune_train, y_tune_val = train_test_split(
     X, y, test_size=0.2, random_state=42, stratify=y
 )
-depths = range(3, 16)
+depths = range(2, 16)
 tune_results = {'f1': [], 'prec': [], 'rec': [], 'acc': []}
 print("-> Đang chạy thử nghiệm các độ sâu...")
 for d in depths:
@@ -102,7 +102,7 @@ for fold, (train_idx, test_idx) in enumerate(kfold.split(X, y), 1):
     y_train_k, y_test_k = y[train_idx], y[test_idx]
     
     model = DecisionTreeClassifier(
-        max_depth=BEST_DEPTH,
+        max_depth=7,
         min_samples_leaf=MIN_LEAF_SIZE, 
         class_weight='balanced',
         random_state=42
@@ -130,21 +130,38 @@ print(f"2. Precision (Độ chuẩn xác): {avg_prec:.2%}")
 print(f"3. Recall (Độ nhạy):         {avg_rec:.2%}")
 print(f"4. F1-Score (Cân bằng):      {avg_f1:.2%}")
 
-# Ma trận nhầm lẫn trung bình
+# Ma trận nhầm lẫn
 mean_cm = np.mean(cm_list, axis=0)
 rounded_cm = np.rint(mean_cm).astype(int)
 axis_labels = [NEGATIVE_CLASS_NAME, POSITIVE_CLASS_NAME]
 
-plt.figure(figsize=(8, 6))
-sns.heatmap(
+plt.figure(figsize=(8, 7))
+ax = sns.heatmap(
     rounded_cm, annot=True, fmt='d', 
     cmap='Blues', 
     xticklabels=axis_labels, yticklabels=axis_labels,
-    annot_kws={"size": 14}
+    annot_kws={"size": 14},
+    cbar=False  
 )
-plt.title(f'Ma trận nhầm lẫn (Decision tree) | Accuracy: {avg_acc:.2%}', fontsize=14)
-plt.xlabel('Dự đoán', fontsize=12); plt.ylabel('Thực tế', fontsize=12)
-plt.tight_layout()
+plt.title('Ma trận nhầm lẫn cho Decision Tree', fontsize=16, pad=20)
+plt.xlabel('Predicted', fontsize=12)
+plt.ylabel('True', fontsize=12)
+stats_text = (
+    f"Đánh giá cho Decision Tree:\n"
+    f"Accuracy: {avg_acc:.4f}\n"
+    f"Precision: {avg_prec:.4f}\n"
+    f"Recall: {avg_rec:.4f}\n"
+    f"F1 Score: {avg_f1:.4f}"
+)
+plt.text(
+    x=0, y=1.12, 
+    s=stats_text, 
+    transform=ax.transAxes, 
+    fontsize=11, 
+    ha='left', va='bottom', 
+    fontfamily='monospace'
+)
+plt.tight_layout(rect=[0, 0, 1, 1])
 plt.savefig("dt_matrix.png")
 print(f"Đã lưu Matrix: dt_matrix.png")
 
@@ -154,7 +171,7 @@ final_model_viz.fit(X, y)
 
 plt.figure(figsize=(25, 10))
 plot_tree(final_model_viz, feature_names=FEATURE_COLUMNS, class_names=axis_labels,
-          filled=True, rounded=True, max_depth=3, fontsize=10)
+          filled=True, rounded=True, max_depth=4, fontsize=10)
 plt.title(f'Cấu trúc Cây Quyết Định (Depth={BEST_DEPTH})')
 plt.savefig("dt_structure.png")
 print(f"Đã lưu Cây quyết định: dt_structure.png")
@@ -167,6 +184,11 @@ plt.figure(figsize=(10, 6))
 plt.title("Các yếu tố ảnh hưởng (Decision Tree)")
 plt.bar(range(X.shape[1]), importances[indices], align="center", color='skyblue')
 plt.xticks(range(X.shape[1]), [FEATURE_COLUMNS[i] for i in indices], rotation=45)
+
+sorted_importances = importances[indices]
+for i, v in enumerate(sorted_importances):
+    plt.text(i, v + 0.002, f"{v:.3f}", ha='center', va='bottom', fontsize=10)
+    
 plt.tight_layout()
 plt.savefig("dt_feature_importance.png")
 print(f" Đã lưu Feature Importance: dt_feature_importance.png")

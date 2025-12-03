@@ -11,10 +11,10 @@ warnings.filterwarnings('ignore')
 model_results = [
     {
         'Model': 'Decision Tree', 
-        'Accuracy': 0.7540,  
-        'Precision': 0.7122,   
-        'Recall': 0.7478,      
-        'F1-Score': 0.7291     
+        'Accuracy': 0.7394,  
+        'Precision': 0.6848,   
+        'Recall': 0.7651,      
+        'F1-Score': 0.7223     
     },
     {
         'Model': 'Random Forest', 
@@ -26,9 +26,9 @@ model_results = [
     {
         'Model': 'XGBoost', 
         'Accuracy': 0.7539,  
-        'Precision': 0.7019,   
-        'Recall': 0.7741,      
-        'F1-Score': 0.736   
+        'Precision': 0.7017,   
+        'Recall': 0.7745,      
+        'F1-Score': 0.7361  
     },
     {
         'Model': 'KNN', 
@@ -49,7 +49,7 @@ print(df_results)
 print("\n--- 2. Đang vẽ biểu đồ tổng kết 2x2... ---")
 
 fig, axes = plt.subplots(2, 2, figsize=(15, 12))
-fig.suptitle('So sánh Hiệu suất 4 mô hình trên lớp "Churn"', fontsize=16, y=1.03)
+fig.suptitle('So sánh hiệu suất 4 mô hình trên lớp "Churn (1)"', fontsize=16, y=0.95)
 sns.set(style='whitegrid')
 df_sorted = df_results.sort_values(by='F1-Score', ascending=False)
 def add_labels(ax):

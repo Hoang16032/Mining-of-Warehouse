@@ -24,7 +24,7 @@ NEGATIVE_CLASS_NAME = 'Ở lại (0)'
 K_FOLDS = 5
 
 print("\n" + "="*60)
-print(f"Depth={10} | Estimators={100} | Min Leaf={10}")
+print(f"'class_weight': 'balanced', 'max_depth': 5, 'max_features': 0.5, 'min_samples_leaf': 1, 'min_samples_split': 10, 'n_estimators': 300")
 print("="*60 + "\n")
 
 try:
@@ -95,18 +95,35 @@ mean_cm = np.mean(cm_list, axis=0)
 rounded_cm = np.rint(mean_cm).astype(int)
 axis_labels = [NEGATIVE_CLASS_NAME, POSITIVE_CLASS_NAME]
 
-plt.figure(figsize=(8, 6))
-sns.heatmap(
+plt.figure(figsize=(8, 7))
+ax = sns.heatmap(
     rounded_cm, annot=True, fmt='d', 
     cmap='Blues', 
     xticklabels=axis_labels, yticklabels=axis_labels,
-    annot_kws={"size": 14}
+    annot_kws={"size": 14},
+    cbar=False  
 )
-plt.title(f'Ma trận nhầm lẫn (Random Forest) | Accuracy: {avg_acc:.2%}', fontsize=14)
-plt.xlabel('Dự đoán', fontsize=12); plt.ylabel('Thực tế', fontsize=12)
-plt.tight_layout()
+plt.title('Ma trận nhầm lẫn cho Random Forest', fontsize=16, pad=20)
+plt.xlabel('Predicted', fontsize=12)
+plt.ylabel('True', fontsize=12)
+stats_text = (
+    f"Đánh giá cho Random Forest:\n"
+    f"Accuracy: {avg_acc:.4f}\n"
+    f"Precision: {avg_prec:.4f}\n"
+    f"Recall: {avg_rec:.4f}\n"
+    f"F1 Score: {avg_f1:.4f}"
+)
+plt.text(
+    x=0, y=1.12, 
+    s=stats_text, 
+    transform=ax.transAxes, 
+    fontsize=11, 
+    ha='left', va='bottom', 
+    fontfamily='monospace'
+)
+plt.tight_layout(rect=[0, 0, 1, 1])
 plt.savefig("rf_matrix.png")
-print(f"\nĐã lưu Matrix: rf_matrix.png")
+print(f"Đã lưu Matrix: rf_matrix.png")
 
 # Feature Importance 
 final_model_viz = RandomForestClassifier(
@@ -128,6 +145,11 @@ plt.figure(figsize=(10, 6))
 plt.title("Các yếu tố ảnh hưởng (Random Forest)")
 plt.bar(range(X.shape[1]), importances[indices], align="center", color='green')
 plt.xticks(range(X.shape[1]), [FEATURE_COLUMNS[i] for i in indices], rotation=45)
+
+sorted_importances = importances[indices]
+for i, v in enumerate(sorted_importances):
+    plt.text(i, v + 0.002, f"{v:.3f}", ha='center', va='bottom', fontsize=10)
+    
 plt.tight_layout()
 plt.savefig("rf_feature_importance.png")
 print(f"Đã lưu Feature Importance: rf_feature_importance.png")
