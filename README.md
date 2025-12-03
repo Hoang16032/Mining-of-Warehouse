@@ -74,12 +74,10 @@ Vui lòng chạy theo thứ tự sau để đảm bảo luồng dữ liệu chí
 
 *(Kết quả: File `rfm_training_data_mall.csv` sẽ được tạo ra)*
 
-**Bước 2: (Tùy chọn) Chạy Tuning để tìm tham số mới**
+**Bước 2: Chạy Tuning để tìm tham số mới**
     python tune_random_forest.py
     python tune_XGboost.py
     python tune_knn.py
-
-*(Lưu ý: Các file model chính đã được cập nhật tham số tốt nhất, bước này có thể bỏ qua nếu không muốn train lại từ đầu)*
 
 **Bước 3: Chạy các mô hình phân loại (K-Fold)**
     python XGboost.py
